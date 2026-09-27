@@ -8,13 +8,24 @@ from reportlab.pdfgen import canvas
 import streamlit as st
 
 st.set_page_config(
-    page_title="Generador de Cotizaciones - Summer Rent a Car",
+    page_title="Generador de Cotizaciones - Rent a Car",
     page_icon="🚗",
     layout="centered",
 )
 
+# --- CONFIGURACIÓN EN LA BARRA LATERAL ---
+st.sidebar.header("⚙️ Configuración del Negocio")
+empresa_nombre = st.sidebar.text_input(
+    "Nombre de la Empresa", "SUMMER RENT A CAR"
+)
+empresa_email = st.sidebar.text_input(
+    "Correo Electrónico", "info@rentacarsummer.com"
+)
+empresa_telefono = st.sidebar.text_input("Teléfono", "+506 64056463")
+empresa_ubicacion = st.sidebar.text_input("Ubicación", "San José, Costa Rica")
 
-def generar_pdf(data, filename):
+
+def generar_pdf(data, empresa_info, filename):
   doc = canvas.Canvas(filename, pagesize=letter)
   width, height = letter
 
@@ -38,15 +49,16 @@ def generar_pdf(data, filename):
     except Exception:
       text_x = left_margin
 
+  # Datos dinámicos de la empresa
   doc.setFont("Helvetica-Bold", 13)
   doc.setFillColor(colors.HexColor("#2C3E50"))
-  doc.drawString(text_x, height - 60, "SUMMER RENT A CAR")
+  doc.drawString(text_x, height - 60, empresa_info["nombre"])
 
   doc.setFont("Helvetica", 8)
   doc.setFillColor(colors.HexColor("#7F8C8D"))
-  doc.drawString(text_x, height - 72, "info@rentacarsummer.com")
-  doc.drawString(text_x, height - 83, "+506 64056463")
-  doc.drawString(text_x, height - 94, "San José, Costa Rica")
+  doc.drawString(text_x, height - 72, empresa_info["email"])
+  doc.drawString(text_x, height - 83, empresa_info["telefono"])
+  doc.drawString(text_x, height - 94, empresa_info["ubicacion"])
 
   doc.setFont("Helvetica-Bold", 12)
   doc.setFillColor(colors.HexColor("#2C3E50"))
@@ -244,16 +256,16 @@ def generar_pdf(data, filename):
   doc.drawCentredString(
       width / 2.0,
       35,
-      "Summer Rent a Car | Thank you for your preference | QUOTE - NOT A"
-      " RESERVATION",
+      f"{empresa_info['nombre']} | Thank you for your preference | QUOTE -"
+      " NOT A RESERVATION",
   )
 
   doc.save()
 
 
-# Interfaz visual
+# Interfaz visual principal
 st.title("🚗 Generador Rápido de Cotizaciones")
-st.subheader("Summer Rent a Car")
+st.subheader(empresa_nombre)
 
 with st.form("form_cotizacion"):
   col1, col2 = st.columns(2)
@@ -278,7 +290,7 @@ with st.form("form_cotizacion"):
         "Depósito de garantía ($)", min_value=0.0, value=500.0, step=50.0
     )
 
-  submitted = st.form_submit_button("Generar Cotización en PDF con Logo")
+  submitted = st.form_submit_button("Generar Cotización en PDF")
 
 if submitted:
   dias = (fecha_regreso - fecha_inicio).days
@@ -287,6 +299,7 @@ if submitted:
   total = dias * precio_por_dia
   quote_num = f"Q-{random.randint(10000, 99999)}"
   issue_date_str = datetime.now().strftime("%d/%m/%Y 00:00")
+
   data = {
       "quote_no": quote_num,
       "issue_date": issue_date_str,
@@ -306,8 +319,15 @@ if submitted:
       "estimated_total": total,
   }
 
+  empresa_info = {
+      "nombre": empresa_nombre,
+      "email": empresa_email,
+      "telefono": empresa_telefono,
+      "ubicacion": empresa_ubicacion,
+  }
+
   pdf_filename = f"{quote_num}.pdf"
-  generar_pdf(data, pdf_filename)
+  generar_pdf(data, empresa_info, pdf_filename)
 
   st.success(
       f"¡Cotización **{quote_num}** generada con éxito! (Días: {dias}, Total:"
@@ -321,7 +341,7 @@ if submitted:
       f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%"'
       ' height="600" type="application/pdf"></iframe>'
   )
-  st.markdown(pdf_display, unsafe_allow_html=True)
+  st.markdown(pdf_display, unsafe_allow.html=True)
 
   with open(pdf_filename, "rb") as pdf_file:
     st.download_button(
