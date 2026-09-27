@@ -1,4 +1,5 @@
 from datetime import datetime
+import base64
 import os
 import random
 from reportlab.lib import colors
@@ -264,7 +265,7 @@ with st.form("form_cotizacion"):
     )
     tipo_vehiculo = st.text_input("Tipo de vehículo", "SUV 4x4 Automatic")
     precio_por_dia = st.number_input(
-        "Precio por día ($)", min_value=0.0, value=60.0, step=5.0
+        "Precio por día ($)", min_value=0.0, value=60.0, step5.0
     )
   with col2:
     fecha_regreso = st.date_input("Fecha de regreso", datetime.now().date())
@@ -313,12 +314,20 @@ if submitted:
       f" ${total:.2f})"
   )
 
-  with open(pdf_filename, "rb") as pdf_file:
-    PDFbyte = pdf_file.read()
+  # Método universal optimizado para celulares y computadoras
+  with open(pdf_filename, "rb") as f:
+    base64_pdf = base64.b64encode(f.read()).decode("utf-8")
 
-  st.download_button(
-      label="📥 Descargar PDF de Cotización",
-      data=PDFbyte,
-      file_name=pdf_filename,
-      mime="application/pdf",
+  pdf_display = (
+      f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%">'
+      ' height="600" type="application/pdf"></iframe>'
   )
+  st.markdown(pdf_display, unsafe_allow.html=True)
+
+  with open(pdf_filename, "rb") as pdf_file:
+    st.download_button(
+        label="📥 Descargar Archivo PDF",
+        data=pdf_file.read(),
+        file_name=pdf_filename,
+        mime="application/pdf",
+    )
