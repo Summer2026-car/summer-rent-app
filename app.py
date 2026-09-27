@@ -265,7 +265,7 @@ with st.form("form_cotizacion"):
     )
     tipo_vehiculo = st.text_input("Tipo de vehículo", "SUV 4x4 Automatic")
     precio_por_dia = st.number_input(
-        "Precio por día ($)", min_value=0.0, value=60.0, step5.0
+        "Precio por día ($)", min_value=0.0, value=60.0, step=5.0
     )
   with col2:
     fecha_regreso = st.date_input("Fecha de regreso", datetime.now().date())
@@ -314,7 +314,6 @@ if submitted:
       f" ${total:.2f})"
   )
 
-  # Método universal optimizado para celulares y computadoras
   with open(pdf_filename, "rb") as f:
     base64_pdf = base64.b64encode(f.read()).decode("utf-8")
 
