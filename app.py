@@ -341,7 +341,7 @@ if submitted:
       f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%"'
       ' height="600" type="application/pdf"></iframe>'
   )
-  st.markdown(pdf_display, unsafe_allow.html=True)
+  st.markdown(pdf_display, unsafe_allow_html=True)
 
   with open(pdf_filename, "rb") as pdf_file:
     st.download_button(
